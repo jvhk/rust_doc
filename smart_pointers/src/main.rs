@@ -40,6 +40,18 @@ fn hello(name: &str){
     println!("Hello {} !", name)
 }
 
+
+// Running code on clean up with the Drop Trair
+struct CustomSmartPointer {
+    data: String,
+}
+
+impl Drop for CustomSmartPointer{
+    fn drop(&mut self){
+        println!("Dropping CustomSmartPointer with data `{}`", self.data)
+    }
+}
+
 fn main() {
     let boxFive = Box::new(5);
     println!("box five {}", boxFive);
@@ -74,4 +86,29 @@ fn main() {
     // Implicit Deref Coercions with Functions and Methods
     let m = MyBox::new(String::from("Rust"));
     hello(&m);
+    hello(&(*m)[..]);
+
+
+    //// Running code on clean up with the Drop Trair
+    println!("Running code on clean up with the Drop Trair:");
+    let custom = CustomSmartPointer {
+        data: String::from("my stuff"),
+    };
+
+    let custom2 = CustomSmartPointer{
+        data: String::from("other stuff"),
+    };
+
+    println!("CustomSmartPointers created");
+
+    //Dropping a Value Early with std::mem::drop (not permited)
+    println!("Dropping a Value Early with std::mem::drop");
+    let custom_to_drop = CustomSmartPointer{
+        data: String::from("some data"),
+    };
+
+    println!("CustomSmartPointer created to std::mem::drop");
+    // custom_to_drop.drop(); //returns a error, because this method cannot be called directely
+    std::mem::drop(custom_to_drop);
+    println!("CustomSmartPointer dropped before the and of `main`");
 }
