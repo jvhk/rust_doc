@@ -52,6 +52,15 @@ impl Drop for CustomSmartPointer{
     }
 }
 
+// Using Rc<T> to Share Data
+enum RcList{
+    Cons(i32, Rc<List>),
+    Nil,
+}
+
+use std::rc::Rc;
+// use crate::RcList::{Cons, Nil};
+
 fn main() {
     let boxFive = Box::new(5);
     println!("box five {}", boxFive);
@@ -111,4 +120,19 @@ fn main() {
     // custom_to_drop.drop(); //returns a error, because this method cannot be called directely
     std::mem::drop(custom_to_drop);
     println!("CustomSmartPointer dropped before the and of `main`");
+
+    
+    // Using Rc<T> to Share Data
+
+    /*    
+    let f = Rc::new(Cons(5, Rc::new(Cons(10, Rc::new(Nil)))));
+    println!("count after creating f = {}", Rc::strong_count(&f));
+    let g = Cons(3, Rc::clone(&f));
+    println!("count after creating g = {}", Rc::strong_count(&f));
+    {
+        let h = Cons(4, Rc::clone(&f));
+        println!("count after creating h = {}", Rc::strong_count(&f));
+    }
+    println!("count after h goes out of scope = {}", Rc::strong_count(&f));
+    */
 }
