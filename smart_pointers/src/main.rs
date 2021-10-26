@@ -7,9 +7,9 @@
 
 
 */
-
+#[derive(Debug)]
 enum List{
-    Cons(i32, Box<List>),
+    Cons(Rc<RefCell<i32>>, Rc<List>),
     Nil,
 }
 
@@ -58,14 +58,15 @@ enum RcList{
     Nil,
 }
 
-use std::rc::Rc;
 // use crate::RcList::{Cons, Nil};
+use std::cell::RefCell;
+use std::rc::Rc;
 
 fn main() {
     let boxFive = Box::new(5);
     println!("box five {}", boxFive);
 
-    let list = Cons(1, Box::new(Cons(2, Box::new(Cons(3, Box::new(Nil))))));
+    //let list = Cons(1, Box::new(Cons(2, Box::new(Cons(3, Box::new(Nil))))));
 
     //Treating Smart Pointers Like Regular References with the Deref Trait
     let x = 5;
@@ -135,4 +136,19 @@ fn main() {
     }
     println!("count after h goes out of scope = {}", Rc::strong_count(&f));
     */
+
+
+    //Having Multiple Owners of Mutable Data by Combining Rc<T> and RefCell<T>
+    let value = Rc::new(RefCell::new(5));
+
+    let e = Rc::new(Cons(Rc::clone(&value), Rc::new(Nil))) ;
+
+    let f = Cons(Rc::new(RefCell::new(3)), Rc::clone(&e));
+    let g = Cons(Rc::new(RefCell::new(4)), Rc::clone(&e));
+
+    *value.borrow_mut() += 10;
+
+    println!("e after = {:?}", e);
+    println!("f after = {:?}", f);
+    println!("g after = {:?}", g);
 }
