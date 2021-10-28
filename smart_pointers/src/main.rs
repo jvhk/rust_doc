@@ -7,10 +7,29 @@
 
 
 */
+
+/*
 #[derive(Debug)]
 enum List{
     Cons(Rc<RefCell<i32>>, Rc<List>),
     Nil,
+}
+*/
+
+//Creating a Reference Cycle
+#[derive(Debug)]
+enum List{
+    Cons(i32, RefCell<Rc<List>>),
+    Nil,
+}
+
+impl List {
+    fn tail(&self) -> Option<&RefCell<Rc<List>>> {
+        match self {
+            Cons(_, item) => Some(item),
+            Nil => None,
+        }
+    }
 }
 
 use crate::List::{Cons,Nil};
@@ -25,6 +44,7 @@ impl<T> MyBox<T> {
 }
 
 
+use std::borrow::{Borrow, BorrowMut};
 // Implementing Deref with deref method to MyBox struct
 use std::ops::Deref;
 
@@ -60,7 +80,15 @@ enum RcList{
 
 // use crate::RcList::{Cons, Nil};
 use std::cell::RefCell;
-use std::rc::Rc;
+use std::rc::{Rc,Weak};
+
+//Creating a Tree Data Structure: a Node with Child Nodes
+#[derive(Debug)]
+struct Node{
+    value: i32,
+    parent: RefCell<Weak<Node>>,
+    children: RefCell<Vec<Rc<Node>>>,
+}
 
 fn main() {
     let boxFive = Box::new(5);
@@ -139,6 +167,7 @@ fn main() {
 
 
     //Having Multiple Owners of Mutable Data by Combining Rc<T> and RefCell<T>
+    /*
     let value = Rc::new(RefCell::new(5));
 
     let e = Rc::new(Cons(Rc::clone(&value), Rc::new(Nil))) ;
@@ -151,4 +180,48 @@ fn main() {
     println!("e after = {:?}", e);
     println!("f after = {:?}", f);
     println!("g after = {:?}", g);
+
+    */
+
+    //Creating a Reference Cycle
+    //{ Creating a reference cycle of two List values pointing to each other }
+
+    let someVar = Rc::new(Cons(5, RefCell::new(Rc::new(Nil))));
+
+    println!("someVar inital rc count = {}", Rc::strong_count(&someVar));
+    println!("someVar next item = {:?}", someVar.tail());
+
+    let someVar2 = Rc::new(Cons(10, RefCell::new(Rc::clone(&someVar))));
+
+    println!("someVar rc count after someVar2 creation = {}", Rc::strong_count(&someVar));
+    println!("someVar2 initial rc count  = {}", Rc::strong_count(&someVar2));
+    println!("someVar2 next item  = {:?}", someVar2.tail());
+
+    if let Some(link) = someVar.tail() {
+        *link.borrow_mut() = Rc::clone(&someVar2);
+    }
+
+    println!("someVar2 rc count after changing someVar = {}", Rc::strong_count(&someVar2));
+    println!("someVar rc count after changing someVar = {}", Rc::strong_count(&someVar));
+
+
+    //Creating a Tree Data Structure: a Node with Child Nodes
+    let leaf = Rc::new(Node {
+        value: 3,
+        parent: RefCell::new(Weak::new()),
+        children: RefCell::new(vec![]),
+    });
+
+    println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
+
+    let branch = Rc::new(Node {
+        value: 5,
+        parent: RefCell::new(Weak::new()),
+        children: RefCell::new(vec![Rc::clone(&leaf)]),
+    });
+
+    *leaf.parent.borrow_mut() = Rc::downgrade(&branch);
+
+    println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
+
 }
