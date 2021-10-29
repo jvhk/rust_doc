@@ -1,8 +1,11 @@
 use std::thread;
 use std::time::Duration;
+use std::sync::mpsc;
 
 
 fn main() {
+
+    /*
 
     // Creating a New Thread with spawn
     let handle = thread::spawn(|| { //Waiting for All Threads to Finish Using join Handles
@@ -31,4 +34,54 @@ fn main() {
     });
 
     handle2.join().unwrap();
+
+*/
+
+    //Using Message Passing to Transfer Data Between Threads
+    let (tx, rx) = mpsc::channel(); //sender / receiver
+
+    thread::spawn(move || {
+        let val = String::from("hi");
+        tx.send(val).unwrap();
+    });
+
+    let received = rx.recv().unwrap();
+    println!("Got: {}", received);
+    
+    //Sending Multiple Values and Seeing the Receiver Waiting
+    let (sen, rec) = mpsc::channel();
+
+    let sen1 = sen.clone();
+    thread::spawn(move || {
+        let vals = vec![
+            String::from("hi"),
+            String::from("from"),
+            String::from("the"),
+            String::from("thread"),
+        ];
+
+        for val in vals {
+            sen1.send(val).unwrap();
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
+
+    thread::spawn(move || {
+        let vals = vec![
+            String::from("more"),
+            String::from("messages"),
+            String::from("for"),
+            String::from("you"),
+        ];
+
+        for val in vals {
+            sen.send(val).unwrap();
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
+
+    for received in rec {
+        println!("Got: {}", received);
+    }
+
 }
