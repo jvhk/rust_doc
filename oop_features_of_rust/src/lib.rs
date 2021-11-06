@@ -1,4 +1,6 @@
 //Encapsulation that Hides Implementation Details
+
+/*
 pub struct AveragedCollection {
     list: Vec<i32>,
     average: f64,
@@ -30,3 +32,40 @@ impl AveragedCollection {
         self.average = total as f64 / self.list.len() as f64;
     }
 }
+
+*/ 
+
+
+//Defining a Trait for Common Behavior
+pub trait Draw{
+    fn draw(&self);
+}
+
+pub struct Screen {
+    pub components: Vec<Box<dyn Draw>>,
+}
+
+impl Screen {
+    pub fn run(&self){
+        for component in self.components.iter(){
+            component.draw();
+        }
+    }
+}
+
+//Implementing the Trait
+pub struct Button {
+    pub width: u32,
+    pub height: u32,
+    pub label: String,
+}
+
+impl Draw for Button{
+    fn draw(&self){
+    // code to actually draw a button
+    }
+}
+
+
+
+
