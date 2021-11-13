@@ -35,7 +35,7 @@ impl AveragedCollection {
 
 */ 
 
-
+/*
 //Defining a Trait for Common Behavior
 pub trait Draw{
     fn draw(&self);
@@ -65,7 +65,101 @@ impl Draw for Button{
     // code to actually draw a button
     }
 }
+*/
 
+pub struct  Post{
+    content: String,    
+}
 
+pub struct DraftPost{
+    content: String,
+}
 
+impl Post{
+    pub fn new() -> DraftPost{
+        DraftPost {
+            content: String::new(),
+        }
+    }
 
+    pub fn content(&self) -> &str{
+        &self.content
+    }
+
+    //Ensuring the Content of a Draft Post Is Empty
+    //pub fn content(&self) -> &str{
+      //  self.state.as_ref().unwrap().content(self)
+    //}
+}
+
+impl DraftPost{
+    pub fn add_text(&mut self, text: &str){
+        self.content.push_str(text);
+    }
+    pub fn request_review(self) -> PendingReviewPost{
+        PendingReviewPost{
+            content: self.content,
+        }
+    }
+
+}
+
+pub struct PendingReviewPost{
+    content: String,
+}
+
+impl PendingReviewPost{
+    pub fn approve(self) -> Post{
+        Post{            
+            content: self.content,
+        }
+    }
+}
+
+trait State{
+    fn request_review(self: Box<Self>) -> Box<dyn State>;
+    fn approve(self: Box<Self>) -> Box<dyn State>;
+
+    //chapter 10 life time argument => <'a> 
+    fn content<'a>(&self, post: &'a Post) -> &'a str{
+        ""
+    }
+
+}
+
+struct Draft{}
+
+impl State for Draft{
+    fn request_review(self: Box<Self>) -> Box<dyn State>{
+        Box::new(PendingReview{})
+    }
+
+    fn approve(self: Box<Self>) -> Box<dyn State>{
+        self
+    }
+}
+
+struct PendingReview{}
+
+impl State for PendingReview{
+    fn request_review(self: Box<Self>) -> Box<dyn State>{
+        self
+    }
+
+    fn approve(self: Box<Self>) -> Box<dyn State>{
+        Box::new(Published {})
+    }
+}
+
+struct  Published{}
+
+//Adding the approve Method that Changes the Behavior of content
+impl State for Published{
+    fn request_review(self: Box<Self>) -> Box<dyn State>{
+        self
+    }
+
+    fn approve(self: Box<Self>) -> Box<dyn State>{
+        self
+    }
+}
