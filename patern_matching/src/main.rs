@@ -54,4 +54,14 @@ fn main() {
     //function parameters
     let point = (3, 5);
     print_coordinates(&point);
+
+
+
+
+    //Refutability: Whether a Pattern Might Fail to Match
+    let some_option_value: Option<i32> = None;
+    if let Some(x) = some_option_value{    //If some_option_value was a None value, it would fail to match the pattern Some(x)
+        println!("{}", x); //to fix the pattern on value None for Some(x), we use 'if let'
+    }
+
 }
