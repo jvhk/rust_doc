@@ -64,4 +64,46 @@ fn main() {
         println!("{}", x); //to fix the pattern on value None for Some(x), we use 'if let'
     }
 
+
+
+    let y = 1;
+
+    match y {
+        1 => println!("one"),
+        2 => println!("two"),
+        3 => println!("three"),
+        4 => println!("four"),
+        _ => println!("anything"),
+    }
+
+    let a = Some(5);
+    let b = 10;
+
+    match a {
+        Some(50) => println!("Got 50"),
+        Some(b) => println!("Matched, b = {:?}", b),
+        _ => println!("Default case, a = {:?}", a),
+    }
+
+    println!("at the end: a = {:?}, b = {:?}", a, b);
+
+
+    //Multiple Patterns on match
+    let c = 1;
+
+    match c {
+        1 | 2 => println!("one or two"),
+        3 => println!("three"),
+        _ => println!("anything"),
+    }
+
+    //Matching Ranges of Values with ..= {works for char values too}
+    let d = 5;
+
+    match d {
+        1..=5 => println!("one through five"),  //range 1,2,3,4,5
+        _ => println!("something else"),
+    }
+
+    
 }
