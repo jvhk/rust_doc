@@ -1,7 +1,28 @@
-
 //function parameters
 fn print_coordinates(&(x, y): &(i32, i32)) {
     println!("Current location: ({}, {})", x, y);
+}
+
+//Destructuring to Break Apart Values
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+
+//Destructuring Enums
+enum Message { 
+    Quit,
+    Move {x:i32, y:i32},
+    Write(String),
+    ChangeColor(Color),
+}
+
+
+//Destructuring Nested Structs and Enums
+enum Color{
+    Rgb(i32,i32,i32),
+    Hsv(i32,i32,i32),
 }
 
 fn main() {
@@ -104,6 +125,55 @@ fn main() {
         1..=5 => println!("one through five"),  //range 1,2,3,4,5
         _ => println!("something else"),
     }
-
     
+
+    //Destructuring to Break Apart Values
+    let p = Point {x: 0, y:7};
+    
+    let Point { x, y } = p;
+    assert_eq!(0, x);
+    assert_eq!(7, y);
+
+
+    match p {
+        Point { x, y:0 } => println!("on the x axis at {}",x),
+        Point { x: 0, y } => println!("on the y axis at {}", y),
+        Point { x, y } => println!("on neither axis: {}, {} ",x,y),
+    }
+
+
+    //Destructuring Enums
+    let msg = Message::ChangeColor(0,160,255);
+/*
+    match msg {
+        Message::Quit => {
+            println!("The Quit variant has no data to destructure.")
+        }
+        Message::Move {x,y} => {
+            println!("Move in the x direction {} and in the y direction {}",
+                x, y);
+        }
+        Message::Write(text) => println!("Text message: {}", text),
+        Message::ChangeColor(r,g,b) => println!(
+          "Change the color to red {}, green {}, and blue {}", r,g,b
+        ),
+    }
+*/
+    //Destructuring Nested Structs and Enums
+    let new_message = Message::ChangeColor(Color::Hsv(0 ,160, 255));
+
+    match new_message {
+        Message::ChangeColor(Color::Rgb(r,g,b)) => println!(
+            "Change the color to red {}, green {}, and blue {}",r,g,b
+        ),
+        Message::ChangeColor(Color::Hsv(h,s,v)) => println!(
+            "Change the color to hue {}, saturation {}, and value {}",
+            h,s,v
+        ),
+        _ => (),
+    }
+
+    //Destructuring Structs and Tuples
+    let ((feet, inches), Point { x, y }) = ((3, 10), Point { x: 3, y: -10 });
+
 }
