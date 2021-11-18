@@ -25,6 +25,18 @@ enum Color{
     Hsv(i32,i32,i32),
 }
 
+//Ignoring entry balue with _
+fn foo(_:i32, y:i32){
+    println!("this code use only the y parameter: {}", y)
+}
+
+//Ignoring Remaining Parts of a Value with ..
+struct New_point {
+    x:i32,
+    y:i32,
+    z:i32,
+}
+
 fn main() {
 
     // NORMAL PATTERN MATCHING
@@ -141,10 +153,10 @@ fn main() {
         Point { x, y } => println!("on neither axis: {}, {} ",x,y),
     }
 
-
+/*
     //Destructuring Enums
     let msg = Message::ChangeColor(0,160,255);
-/*
+
     match msg {
         Message::Quit => {
             println!("The Quit variant has no data to destructure.")
@@ -175,5 +187,52 @@ fn main() {
 
     //Destructuring Structs and Tuples
     let ((feet, inches), Point { x, y }) = ((3, 10), Point { x: 3, y: -10 });
+    
 
+    //Ignoring parameter values with _  
+    foo(3, 6);
+
+    //Ignoring Parts of a Value with a Nested _
+    let mut setting_value = Some(5);
+    let new_setting_value = Some(10);
+
+    match (setting_value, new_setting_value) {
+        (Some(_), Some(_)) => {
+            println!("Can't overwrite an customized value");
+        }
+        _ => {
+            setting_value = new_setting_value;
+        }
+    }
+
+    println!("setting is {:?}", setting_value);
+
+    let numbers = (2,3,4,5,6);
+
+    match numbers {
+        (first, _, third, _, fifth) => {
+            println!("Some numbers ({}, {}, {})",first,third,fifth);
+        }
+    }
+
+    //Ignoring an unused variable by starting this name with _
+    let _ignored1 = 5;
+    let _ignored2 = 3;
+    
+    //Ignoring Remaining Parts of a Value with ..
+    let origin = New_point {x:0, y:0, z:0};
+
+    match origin {
+        New_point { x, .. } => println!("x is {}", x),
+    }
+
+
+    //Extra Conditionals with Match Guards
+    let extra = Some(4);
+
+    match extra {
+        Some(x) if x < 5 => println!("less than five: {}", x),
+        Some(x) => println!("{}", x),
+        None => (),
+    }
 }
